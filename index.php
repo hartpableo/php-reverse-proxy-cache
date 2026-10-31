@@ -8,6 +8,20 @@ require_once __DIR__ . '/autoloader.php';
 $args = new \ReverseProxyCache\ArgumentParser($argv ?? [])->parse();
 $errors = [];
 
+// Clear cache
+if (isset($args['clear-cache'])) {
+  $files = array_filter(glob(__DIR__ . "/cache/{.,}*", GLOB_BRACE), function($file) {
+    $basename = basename($file);
+    return !in_array($basename, ['.', '..', '.gitkeep']);
+  });
+  foreach ($files as $file) {
+    unlink($file);
+  }
+
+  echo "\033[32mCache cleared!\033[0m\n";
+  exit;
+}
+
 if (!isset($args['origin'])) {
   $errors[] = 'origin argument is required';
 }
